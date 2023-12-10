@@ -66,6 +66,7 @@ Encuentra y abre el archivo de configuración de Apache del docker. Para nuestra
 
 - **apache2-php/conf/000-default.conf:** para ricardo-fernandez-guzman-www.local
 - **apache2-php/conf/intranet.conf:** para ricardo-fernandez-guzman-intranet.local
+
 ![estructura](docs/images/imagen3.png)
 
 #### 1.4. Editar el Archivo de Configuración
@@ -113,9 +114,11 @@ docker-compose restart
 A continuación ya se deberia de poder acceder utilizando las siguientes URLs
 
 http://ricardo-fernandez-guzman-www.local
+
 ![www.local](docs/images/imagen4.png)
 
 http://ricardo-fernandez-guzman-intranet.local
+
 ![intranet.local](docs/images/imagen5.png)
 
 ### 2. Creación de Virtual Host para PhpMyAdmin
