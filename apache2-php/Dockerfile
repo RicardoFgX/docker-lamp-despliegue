@@ -32,7 +32,8 @@ COPY ./certs /etc/apache2/ssl
 RUN a2enmod ssl
 
 # Habilitar los virtual hosts
-RUN a2ensite intranet.conf ricardo-fernandez-guzman-phpmyadmin.conf
+RUN a2ensite intranet.conf
+RUN a2ensite ricardo-fernandez-guzman-phpmyadmin.conf
 
 
 
