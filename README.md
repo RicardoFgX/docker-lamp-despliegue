@@ -161,6 +161,7 @@ http://ricardo-fernandez-guzman-www.local
 ![www.local](docs/images/imagen4.png)
 
 http://ricardo-fernandez-guzman-intranet.local:8060
+
 Para este caso, debido a la configuración que hemos establecido, es necesario loguearse con un usuario y contraseña válidos. Estos serían los dispuestos en el archivo htpasswd.dist. Los cuales siguen la estructura **usuario:contraseña-cifrada**.
 
 En este caso hemos entrado con el usuario configurado por defecto que seria usuario1 y contraseña 123456789.
