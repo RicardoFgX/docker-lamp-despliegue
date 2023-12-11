@@ -88,6 +88,7 @@ Abrir el archivo de hosts en el sistema. Este archivo generalmente se encuentra 
 - **Linux/Mac:** /etc/hosts
 
 En mi caso estoy usando windows por lo que se llegaría a esta carpeta:
+
 ![arhivoHost](docs/images/imagen1.png)
 
 #### 1.2. Editar el Archivo de Hosts
@@ -113,7 +114,7 @@ Nos dirigimos al archivo de configuración de nuestras páginas del servidor web
 
 #### 1.4. Editar el Archivo de Configuración
 
-Busca las líneas relacionadas con los VirtualHost y modifica los ServerName para reflejar tus nuevos nombres.
+En los archivos de configuración se buscan las líneas relacionadas con los VirtualHost y se modifican los ServerName para reflejar tus nuevos nombres.
 
 ##### Para ricardo-fernandez-guzman-www.local
 
@@ -200,12 +201,12 @@ Con esto lo que se consigue es que para ricardo-fernandez-guzman-phpmyadmin.loca
 ![NuevoHtmlIntranet](docs/images/imagen28.png)
 
 ### 3. Modificación del Index.html de Intranet
-Para ello hay que modificar el archivo que se encuentra en [apache2-php/www/intranet/index.html](apache2-php/www/intranet/index.html) y cambiarlo como uno prefiera. En mi caso, ahora la página princiapal para intranet es la siguiente:
+Para ello hay que modificar el archivo que se encuentra en [apache2-php/www/intranet/index.html](apache2-php/www/intranet/index.html) y cambiarlo como uno prefiera. En mi caso, ahora la página principal para intranet es la siguiente:
 
 ![NuevoHtmlIntranet](docs/images/imagen7.png)
 ### 4. Añadir Nuevo Usuario
 
-Nos piden añadir un nuevo usuario que cuente con la estructura nombre-apellidos a la lista de usuarios que pueden acceder a intranet. Para ello moficaremos el archivo donde se guardan los usuarios y contraseñas([aqui](apache2-php/etc/apache2/.htpasswd)).
+Nos piden añadir un nuevo usuario que cuente con la estructura nombre-apellidos a la lista de usuarios que pueden acceder a intranet. Para ello modificaremos el archivo donde se guardan los usuarios y contraseñas([aqui](apache2-php/etc/apache2/.htpasswd)).
 
 Como mencioné antes los usuarios siguen la estructura de usuario-contraseña-cifrada, para realizar esto manera sencilla se ha empleado la página web [hellotools](https://hellotools.org/es/generar-cifrar-contrasena-para-archivo-htpasswd).
 
@@ -219,62 +220,63 @@ ricardofernandezguzman:$2y$10$PBhaC1jM.yG8Ty7g4fQYaellCkJvg2BeTxhokNGADvv5v8/bJh
 ```
 Para que se apliquen todos estos cambios habría que resetear apache, aunque a mi por algún motivo con eso no me ha funcionado y he tenido que volver a buildear el docker-compose con el comando 
 ```
-docker-compose restart
+docker-compose build
 ```
-![Docker-compose-Restart](docs/images/imagen12.png)
+![Docker-compose-Build](docs/images/imagen12.png)
 
 A continuación se puede entrar en intranet con el nuevo usuario con su respectiva contraseña:
 
-![Docker-compose-Restart](docs/images/imagen10.png)
-![Docker-compose-Restart](docs/images/imagen11.png)
+![LogueoUsuarioCreado](docs/images/imagen10.png)
+![AccesoUsuarioLogueado](docs/images/imagen11.png)
 
 ### 5. Instalación de CMS Wordpress
 Lo primero es acceder al menú de phpMyAdmin utilizando el usuario y contraseña configurados. Al hacerlo entraremos en una ventana similar a la siguiente. El primer paso será ir a la sección para ver todas las bases de datos, se encuentra en el header superior.
 
-![Docker-compose-Restart](docs/images/imagen13.png)
+![Principalphp](docs/images/imagen13.png)
 
 Crearemos una base de datos que será la que utilizaremos para el WordPress, yo no me he comido mucho la cabeza y la he llamado WordPress
-![Docker-compose-Restart](docs/images/imagen14.png)
+
+![Basesphp](docs/images/imagen14.png)
 
 Lo siguiente es crear a un usuario, para ello nos vamos al menú principal de phpMyAdmin en la sección de Cuentas de usuarios
 
-![Docker-compose-Restart](docs/images/imagen15.png)
+![CuentaUsuarioPhp](docs/images/imagen15.png)
 
 Aparecen todos los usuarios que ya tenemos, pero como lo que vamos a hacer es uno nuevo le damos al enlace que está debajo de estos usuarios que dice "Agregar cuenta de usuario"
 
-![Docker-compose-Restart](docs/images/imagen16.png)
+![NuevoUsuarioPhp](docs/images/imagen16.png)
 
-En este formulario es obligatorio rellenar el nombre, que le hemos puesto wordPress y una contraseña recomendable una segura y activar el tick para otorgarle todos los privilegios
+En este formulario es obligatorio rellenar el nombre, que le hemos puesto wordPress y una contraseña recomendable segura y activar el tick para otorgarle todos los privilegios
 
-![Docker-compose-Restart](docs/images/imagen17.png)
+![AgregarUsuario](docs/images/imagen17.png)
 
 Volvemos a la ventana con todos los usuarios y ahora vemos que aparece nuestro usuario "wordpress" y vamos a editar los privilegios de este usuario
 
-![Docker-compose-Restart](docs/images/imagen18.png)
+![EditarPrivilegios1](docs/images/imagen18.png)
 
 Le damos en la parte superior en donde pone "Base de datos" porque vamos a configurar los permisos de este usuario en la base de datos wordpress
 
-![Docker-compose-Restart](docs/images/imagen19.png)
-![Docker-compose-Restart](docs/images/imagen20.png)
+![EditarPrivilegios2](docs/images/imagen19.png)
+![EditarPrivilegios3](docs/images/imagen20.png)
 
  A continuación nos aparecerá un menu para asignarle permisos sobre esa base de datos, similar como parece en la configuración de permisos global. Le asignamos todos los permisos dandole al tick que nos permite esta opción.
  Esto sería todo lo que hay que configurar en el phpMyAdmin.
 
  En nuestro proyecto, lo primero sería descargar WordPress, se puede hacer desde la página Oficial de [WordPress](https://es.wordpress.org/download/)
 
-![Docker-compose-Restart](docs/images/imagen21.png)
+![wordPressPrincipal](docs/images/imagen21.png)
 
 Una vez hecho, guardaremos la carpeta de WordPress en ```apache2-php/www``` .Quedaría de la siguiente forma:
 
-![Docker-compose-Restart](docs/images/imagen26.png)
+![UbicacionWordPress](docs/images/imagen26.png)
 
 Dentro de esta carpeta hay que modificar el archivo ```wp-config.php``` y asignarles los valores de nuestra base de datos creada en phpMyAdmin en este archivo de configuración; nombre de la base de datos, usuario, contraseña y el host. Este último se puede encontrar en la parte superior de phpMyAdmin.
 
-![Docker-compose-Restart](docs/images/imagen27.png)
+![Servidor](docs/images/imagen27.png)
 
 Mi configuración es esta:
 
-![Docker-compose-Restart](docs/images/imagen22.png)
+![ConfiguracionWordPress](docs/images/imagen22.png)
 
 En principio ya tenemos todo configurado, para que se actualice todas estas configuraciones realizamos un reset a nuestro docker compose ```docker-compose restart```
 
@@ -286,13 +288,13 @@ http://ricardo-fernandez-guzman-intranet.local/wordpress/wp-admin/install.php
 
 Ya solo queda configurar con la información que se quiera el título, así como el usuario y la contraseña, que ya viene generada de base una segura, además del email. Guardamos en un bloc de notas aparte el usuario y la contraseña para no perderlos. Una vez rellenado este formulario le damos al botón de instalar WordPress.
 
-![Docker-compose-Restart](docs/images/imagen23.png)
+![CreaciónWordPress](docs/images/imagen23.png)
 
 Al acabar podremos logearnos con el usuario y la contraseña definidos anteriormente
 
-![Docker-compose-Restart](docs/images/imagen24.png)
+![LoginWordPress](docs/images/imagen24.png)
 
-![Docker-compose-Restart](docs/images/imagen25.png)
+![PrincipalWordpress](docs/images/imagen25.png)
 
 ## PARTE 2: Instalación de Certificados SSL
 
@@ -323,7 +325,7 @@ Lo que si que es importante es que en el apartado de Common Name se introduzca e
 
 En la siguiente imagen muestra la ejecución del comando de creación de certificado, en este caso para crear el certificado de intranet.local
 
-![Docker-compose-Restart](docs/images/imagen30.png)
+![EjemploCreaciónCertificado](docs/images/imagen30.png)
 
 Adicionalmente se pide realizar el certificado HTTPS para el virtual Host de phpMyAdmin(**ricardo-fernandez-guzman-phpmyadmin.local**)
 Mis certificados para este virtual host se llamaran phpmyadmin.crt y phpmyadmin.key y se pueden crear con el siguiente comando y presentará una pantalla similar a la de la creación de los anterirores certificados:
@@ -333,7 +335,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout phpmyadmin.key -out 
 
 Para organizar un poco esto, la estructura de mi carpetas de certificados sería la siguiente:
 
-![Docker-compose-Restart](docs/images/imagen33.png)
+![EstructuraCert](docs/images/imagen33.png)
 
 ### 2. Configurar para el protocolo HTTPS
 A continuación, para cada archivo de configuración añadimos una regla nueva justo después de la etiqueta *Directory* para que se verifique se usa el certificado y permita direcciones HTTPS
@@ -377,19 +379,25 @@ El DockerFile ya estaria completamente configurado y podría de verse su estruct
 **Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-www.local**
 De esta forma, si ahora intentamos entrar en la página mediante protocolo seguro HTTPS, nos aparecerá un mensaje de advertencia diciendo que la conexión no es segura. Esto es correcto ya que los certificados los hemos realizado nosotros mismos.
 
-![Docker-compose-Restart](docs/images/imagen35.png)
+![Evidencia-wwww](docs/images/imagen35.png)
 
 Para acceder a la página entramos en el enlace "Help me understand" y le damos a que queremos ir a ese enlace:
 
-![Docker-compose-Restart](docs/images/imagen36.png)
-![Docker-compose-Restart](docs/images/imagen37.png)
+![Evidencia-wwww](docs/images/imagen36.png)
+![Evidencia-wwww](docs/images/imagen37.png)
 
-**Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-www.local**
+**Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-intranet.local**
 Al igual que como ocurre en el caso anterior nos saldrá el mismo mensaje de advertencia que en el caso anterior. Se realiza el mismo proceso.
 
-![Docker-compose-Restart](docs/images/imagen31.png)
+![Evidencia-intranet](docs/images/imagen31.png)
 
 La diferencia con respecto al anterior y es que, como lo tenemos configurado, claramente nos va a pedir la verificación de usuario válido. La realizamos con el usuario que se configuró en pasos anteriores y podremos acceder a la página
 
-![Docker-compose-Restart](docs/images/imagen32.png)
-![Docker-compose-Restart](docs/images/imagen34.png)
+![Evidencia-intranet](docs/images/imagen32.png)
+![Evidencia-intranet](docs/images/imagen34.png)
+
+**Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-phpmyadmin.local**
+Por último pero no menos importante, probamos la url con el protocolo seguro para el virtual host de phpMyAdmin, y, se tiene configurado bien ocurrire como en los dos anteriores casos y se obtendrá la ventana de advertencia y al hacerlos, tal y como lo hemos configurado se accederá a la página principal de phpMyAdmin, una vez que se haya validado el usuario que intenta ingresar.
+
+![Evidencia-php](docs/images/imagen38.png)
+![Evidencia-php](docs/images/imagen39.png)
