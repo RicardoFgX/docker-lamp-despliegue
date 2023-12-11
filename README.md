@@ -19,10 +19,9 @@
     1. [Generación de Certificados](#1-generación-de-certificados)
         - [2.1.1. Crear Directorio de Certificados](#11-crear-directorio-de-certificados)
         - [2.1.2. Lanzar el Comando de Generación de Certificados](#12-lanzar-el-comando-de-generación-de-certificados)
-        - [2.1.3. Especificar Common Name](#13-especificar-common-name)
     2. [Configurar Virtual Host 443](#2-configurar-virtual-host-443)
-        - [2.2.1. Editar el Archivo de Configuración](#22-editar-el-archivo-de-configuración)
     3. [Habilitar Módulo mod_ssl](#3-habilitar-módulo-mod_ssl)
+    4. [Evidencias de ejecución](#4-evidencias-de-ejecución)
 
 ## Requisitos Previos
 
@@ -196,11 +195,14 @@ Listen 8081
     ProxyPassReverse / http://phpmyadmin:80/
 </VirtualHost>
 ```
+Con esto lo que se consigue es que para ricardo-fernandez-guzman-phpmyadmin.local te mande a la página de phpMyAdmin
+
+![NuevoHtmlIntranet](docs/images/imagen28.png)
+
 ### 3. Modificación del Index.html de Intranet
 Para ello hay que modificar el archivo que se encuentra en [apache2-php/www/intranet/index.html](apache2-php/www/intranet/index.html) y cambiarlo como uno prefiera. En mi caso, ahora la página princiapal para intranet es la siguiente:
 
 ![NuevoHtmlIntranet](docs/images/imagen7.png)
-
 ### 4. Añadir Nuevo Usuario
 
 Nos piden añadir un nuevo usuario que cuente con la estructura nombre-apellidos a la lista de usuarios que pueden acceder a intranet. Para ello moficaremos el archivo donde se guardan los usuarios y contraseñas([aqui](apache2-php/etc/apache2/.htpasswd)).
@@ -297,9 +299,97 @@ Al acabar podremos logearnos con el usuario y la contraseña definidos anteriorm
 ### 1. Generación de Certificados
 
 #### 1.1 Crear Directorio de Certificados
-#### 1.2 Lanzar el Comando de Generación de Certificados
-#### 1.3 Editar el Archivo de Configuración
+Para empezar, se va a crear una un directorio dentro de apache2-php. Abro un terminal desde apache2-php y creo una carpeta mediante comando y seguidamente nos metemos en esta carpeta que es donde se van a crear los certificados
+```
+mkdir certs
+cd certs
+```
 
-### 2. Configurar Virtual Host 443
+#### 1.2 Lanzar el Comando de Generación de Certificados
+
+El comando para la generación de certificados tiene la siguiente estructura:
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nombre-certificado.key -out nombre-certificado.crt
+```
+
+Para local se van a llamar www y para intranet se van a llamar intranet, quedando los comandos como:
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout www.key -out www.crt
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout intranet.key -out intranet.crt
+```
+
+Al ejecutar cada uno de los comandos muestra un pequeño formulario que nos pedira información tal como el pais, estado, organización, correo, entre otras.
+Lo que si que es importante es que en el apartado de Common Name se introduzca el nombre del domino, es decir, www.local e intranet.local
+
+En la siguiente imagen muestra la ejecución del comando de creación de certificado, en este caso para crear el certificado de intranet.local
+
+![Docker-compose-Restart](docs/images/imagen30.png)
+
+Adicionalmente se pide realizar el certificado HTTPS para el virtual Host de phpMyAdmin(**ricardo-fernandez-guzman-phpmyadmin.local**)
+Mis certificados para este virtual host se llamaran phpmyadmin.crt y phpmyadmin.key y se pueden crear con el siguiente comando y presentará una pantalla similar a la de la creación de los anterirores certificados:
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout phpmyadmin.key -out phpmyadmin.crt
+```
+
+Para organizar un poco esto, la estructura de mi carpetas de certificados sería la siguiente:
+
+![Docker-compose-Restart](docs/images/imagen33.png)
+
+### 2. Configurar para el protocolo HTTPS
+A continuación, para cada archivo de configuración añadimos una regla nueva justo después de la etiqueta *Directory* para que se verifique se usa el certificado y permita direcciones HTTPS
+
+[**Para ricardo-fernandez-guzman-www.local**](apache2-php/conf/00-default.conf)
+```
+SSLEngine on
+SSLCertificateFile /etc/apache2/ssl/www.crt
+SSLCertificateKeyFile /etc/apache2/ssl/www.key
+```
+
+[**Para ricardo-fernandez-guzman-intranet.local**](apache2-php/conf/intranet.conf)
+```
+SSLEngine on
+SSLCertificateFile /etc/apache2/ssl/intranet.crt
+SSLCertificateKeyFile /etc/apache2/ssl/intranet.key
+```
+
+[**Para ricardo-fernandez-guzman-phpmyadmin.local**](apache2-php/conf/ricardo-fernandez-guzman-phpmyadmin.conf)
+```
+SSLEngine on
+SSLCertificateFile /etc/apache2/ssl/phpmyadmin.crt
+SSLCertificateKeyFile /etc/apache2/ssl/phpmyadmin.key
+```
 
 ### 3. Habilitar Módulo mod_ssl
+Primero debemos añadir un par de lineas al DockerFile, la primera una para que lleve los certificados a /etc/apache/ssl
+```
+COPY ./certs /etc/apache2/ssl
+```
+
+La siguiente linea la añadiremos después de la anterior y será la que nos habilitará el módulo ssl:
+```
+RUN a2enmod ssl
+```
+
+El DockerFile ya estaria completamente configurado y podría de verse su estructura completa en el siguiente [enlace](apache2-php/Dockerfile).
+
+###4. Evidencias de ejecución
+
+**Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-www.local**
+De esta forma, si ahora intentamos entrar en la página mediante protocolo seguro HTTPS, nos aparecerá un mensaje de advertencia diciendo que la conexión no es segura. Esto es correcto ya que los certificados los hemos realizado nosotros mismos.
+
+![Docker-compose-Restart](docs/images/imagen35.png)
+
+Para acceder a la página entramos en el enlace "Help me understand" y le damos a que queremos ir a ese enlace:
+
+![Docker-compose-Restart](docs/images/imagen36.png)
+![Docker-compose-Restart](docs/images/imagen37.png)
+
+**Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-www.local**
+Al igual que como ocurre en el caso anterior nos saldrá el mismo mensaje de advertencia que en el caso anterior. Se realiza el mismo proceso.
+
+![Docker-compose-Restart](docs/images/imagen31.png)
+
+La diferencia con respecto al anterior y es que, como lo tenemos configurado, claramente nos va a pedir la verificación de usuario válido. La realizamos con el usuario que se configuró en pasos anteriores y podremos acceder a la página
+
+![Docker-compose-Restart](docs/images/imagen32.png)
+![Docker-compose-Restart](docs/images/imagen34.png)
