@@ -374,7 +374,7 @@ RUN a2enmod ssl
 
 El DockerFile ya estaria completamente configurado y podría de verse su estructura completa en el siguiente [enlace](apache2-php/Dockerfile).
 
-###4. Evidencias de ejecución
+### 4. Evidencias de ejecución
 
 **Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-www.local**
 De esta forma, si ahora intentamos entrar en la página mediante protocolo seguro HTTPS, nos aparecerá un mensaje de advertencia diciendo que la conexión no es segura. Esto es correcto ya que los certificados los hemos realizado nosotros mismos.
