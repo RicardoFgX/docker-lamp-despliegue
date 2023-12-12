@@ -161,6 +161,7 @@ http://ricardo-fernandez-guzman-www.local
 ![www.local](docs/images/imagen4.png)
 
 http://ricardo-fernandez-guzman-intranet.local:8060
+
 Para este caso, debido a la configuración que hemos establecido, es necesario loguearse con un usuario y contraseña válidos. Estos serían los dispuestos en el archivo htpasswd.dist. Los cuales siguen la estructura **usuario:contraseña-cifrada**.
 
 En este caso hemos entrado con el usuario configurado por defecto que seria usuario1 y contraseña 123456789.
@@ -374,7 +375,7 @@ RUN a2enmod ssl
 
 El DockerFile ya estaria completamente configurado y podría de verse su estructura completa en el siguiente [enlace](apache2-php/Dockerfile).
 
-###4. Evidencias de ejecución
+### 4. Evidencias de ejecución
 
 **Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-www.local**
 De esta forma, si ahora intentamos entrar en la página mediante protocolo seguro HTTPS, nos aparecerá un mensaje de advertencia diciendo que la conexión no es segura. Esto es correcto ya que los certificados los hemos realizado nosotros mismos.
