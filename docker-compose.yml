@@ -25,6 +25,7 @@ services:
         ports: 
             - "80:80"
             - "8060:8060"
+            - "443:443"
         volumes:
             # Volumen para que los archivos de configuración de los sitios web publicado sean copiados del disco local a su ubicación correcta dentro del contenedor
             - ./apache2-php/www:/var/www/html

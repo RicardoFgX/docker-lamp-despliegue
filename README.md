@@ -156,6 +156,8 @@ docker-compose restart
 ```
 A continuación ya se deberia de poder acceder utilizando las siguientes URLs
 
+![dockerReinicio](docs/images/dockerReinicio.png)
+
 http://ricardo-fernandez-guzman-www.local
 
 ![www.local](docs/images/imagen4.png)
@@ -339,27 +341,75 @@ Para organizar un poco esto, la estructura de mi carpetas de certificados sería
 ![EstructuraCert](docs/images/imagen33.png)
 
 ### 2. Configurar para el protocolo HTTPS
-A continuación, para cada archivo de configuración añadimos una regla nueva justo después de la etiqueta *Directory* para que se verifique se usa el certificado y permita direcciones HTTPS
+A continuación, para cada archivo de configuración añadimos una regla nueva justo después de la  que ya teniamos especificada para que verifique se usa el certificado y permita direcciones HTTPS por el puerto 443:
 
 [**Para ricardo-fernandez-guzman-www.local**](apache2-php/conf/00-default.conf)
 ```
-SSLEngine on
-SSLCertificateFile /etc/apache2/ssl/www.crt
-SSLCertificateKeyFile /etc/apache2/ssl/www.key
+<VirtualHost *:443>
+    ServerName ricardo-fernandez-guzman-www.local
+    DocumentRoot /var/www/html
+
+    <Directory /var/www/html>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    SSLEngine on
+    SSLCertificateFile /etc/apache2/ssl/www.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/www.key
+</VirtualHost>
 ```
 
 [**Para ricardo-fernandez-guzman-intranet.local**](apache2-php/conf/intranet.conf)
 ```
-SSLEngine on
-SSLCertificateFile /etc/apache2/ssl/intranet.crt
-SSLCertificateKeyFile /etc/apache2/ssl/intranet.key
+<VirtualHost *:443>
+    ServerName alvaro-rodriguez-intranet.local
+    DocumentRoot /var/www/html/intranet
+
+    <Directory /var/www/html/intranet>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+
+        AuthType Basic
+        AuthName "Area Restringida"
+        AuthUserFile /etc/apache2/.htpasswd
+        Require valid-user
+    </Directory>
+
+    SSLEngine on
+    SSLCertificateFile /etc/apache2/ssl/intranet.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/intranet.key
+
+
+</VirtualHost>
 ```
 
 [**Para ricardo-fernandez-guzman-phpmyadmin.local**](apache2-php/conf/ricardo-fernandez-guzman-phpmyadmin.conf)
 ```
-SSLEngine on
-SSLCertificateFile /etc/apache2/ssl/phpmyadmin.crt
-SSLCertificateKeyFile /etc/apache2/ssl/phpmyadmin.key
+<VirtualHost *:443>
+    ServerName ricardo-fernandez-guzman-phpmyadmin.local
+    DocumentRoot /var/www/html/intranet
+    
+    <Location />
+        Options Indexes FollowSymLinks
+        AllowOverride All
+
+        AuthType Basic
+        AuthName "Area Restringida"
+        AuthUserFile /etc/apache2/.htpasswd
+        Require valid-user
+
+    </Location>
+
+    ProxyPreserveHost On
+    ProxyPass / http://phpmyadmin:80/
+    ProxyPassReverse / http://phpmyadmin:80/
+
+    SSLEngine on
+    SSLCertificateFile /etc/apache2/ssl/phpmyadmin.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/phpmyadmin.key
+
+</VirtualHost>
 ```
 
 ### 3. Habilitar Módulo mod_ssl
@@ -377,17 +427,24 @@ El DockerFile ya estaria completamente configurado y podría de verse su estruct
 
 ### 4. Evidencias de ejecución
 
+Ahora si intentamos acceder a cualquiera de los enlaces mediante el protocolo HTTP, saldrá un mensaje de error similar al siguiente, pidiendonos que utilicemos el protocolo HTTPS. En este ejemplo se ha hecho para http://ricardo-fernandez-guzman-www.local
+
+![badRequest](docs/images/badRequest.png)
+
 **Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-www.local**
-De esta forma, si ahora intentamos entrar en la página mediante protocolo seguro HTTPS, nos aparecerá un mensaje de advertencia diciendo que la conexión no es segura. Esto es correcto ya que los certificados los hemos realizado nosotros mismos.
+De esta forma, si ahora intentamos entrar en la página mediante protocolo seguro HTTPS (https://ricardo-fernandez-guzman-www.local), nos aparecerá un mensaje de advertencia diciendo que la conexión no es segura. Esto es correcto ya que los certificados los hemos realizado nosotros mismos.
 
 ![Evidencia-wwww](docs/images/imagen35.png)
+
 
 Para acceder a la página entramos en el enlace "Help me understand" y le damos a que queremos ir a ese enlace:
 
 ![Evidencia-wwww](docs/images/imagen36.png)
 ![Evidencia-wwww](docs/images/imagen37.png)
+![Evidencia-wwww](docs/images/certificado.png)
 
 **Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-intranet.local**
+https://ricardo-fernandez-guzman-intranet.local:8060
 Al igual que como ocurre en el caso anterior nos saldrá el mismo mensaje de advertencia que en el caso anterior. Se realiza el mismo proceso.
 
 ![Evidencia-intranet](docs/images/imagen31.png)
@@ -396,9 +453,11 @@ La diferencia con respecto al anterior y es que, como lo tenemos configurado, cl
 
 ![Evidencia-intranet](docs/images/imagen32.png)
 ![Evidencia-intranet](docs/images/imagen34.png)
+![Evidencia-intranet](docs/images/cetificadoIntranet.png)
 
 **Evidencias de ejecución HTTPS para ricardo-fernandez-guzman-phpmyadmin.local**
-Por último pero no menos importante, probamos la url con el protocolo seguro para el virtual host de phpMyAdmin, y, se tiene configurado bien ocurrire como en los dos anteriores casos y se obtendrá la ventana de advertencia y al hacerlos, tal y como lo hemos configurado se accederá a la página principal de phpMyAdmin, una vez que se haya validado el usuario que intenta ingresar.
+Por último pero no menos importante, probamos la url con el protocolo seguro para el virtual host de phpMyAdmin (https://ricardo-fernandez-guzman-phpmyadmin.local), y, se tiene configurado bien ocurrire como en los dos anteriores casos y se obtendrá la ventana de advertencia y al hacerlos, tal y como lo hemos configurado se accederá a la página principal de phpMyAdmin, una vez que se haya validado el usuario que intenta ingresar.
 
 ![Evidencia-php](docs/images/imagen38.png)
 ![Evidencia-php](docs/images/imagen39.png)
+![Evidencia-php](docs/images/certificadophp.png)
