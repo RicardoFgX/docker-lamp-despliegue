@@ -363,7 +363,7 @@ A continuación, para cada archivo de configuración añadimos una regla nueva j
 [**Para ricardo-fernandez-guzman-intranet.local**](apache2-php/conf/intranet.conf)
 ```
 <VirtualHost *:443>
-    ServerName alvaro-rodriguez-intranet.local
+    ServerName ricardo-fernandez-guzman-intranet.local
     DocumentRoot /var/www/html/intranet
 
     <Directory /var/www/html/intranet>
